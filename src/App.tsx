@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect} from 'react'
 import './App.css';
 import {Todolist} from './Todolist';
-import {AddItemForm} from './AddItemForm';
+import {AddItemForm} from './components/AddItemForm';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -26,17 +26,21 @@ import {
 import {useDispatch} from 'react-redux';
 import {useAppSelector} from './state/store';
 import {TaskStatuses, TaskType} from './api/todolists-api'
+import {LinearProgress} from "@mui/material";
+import { ErrorSnackbars } from './components/ErrorSnackbar';
+import {AppStatusType} from "./state/app-reducer";
+
 
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
 }
 
-
 function App() {
-
     const todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useAppSelector<TasksStateType>(state => state.tasks)
+
+    const status = useAppSelector<AppStatusType>((state)=> state.app.status)
     const dispatch = useDispatch();
 
 
@@ -85,10 +89,10 @@ function App() {
         dispatch(thunk);
     }, [dispatch]);
 
-
     return (
         <div className="App">
             <AppBar position="static">
+                <ErrorSnackbars/>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" aria-label="menu">
                         <Menu/>
@@ -98,6 +102,7 @@ function App() {
                     </Typography>
                     <Button color="inherit">Login</Button>
                 </Toolbar>
+                {status === 'loading' && <LinearProgress />}
             </AppBar>
             <Container fixed>
                 <Grid container style={{padding: '20px'}}>
@@ -113,6 +118,7 @@ function App() {
                                     <Todolist
                                         id={tl.id}
                                         title={tl.title}
+                                        entityStatus={tl.entityStatus}
                                         tasks={allTodolistTasks}
                                         removeTask={removeTask}
                                         changeFilter={changeFilter}

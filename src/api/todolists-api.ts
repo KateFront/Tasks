@@ -1,10 +1,10 @@
-import axios, { AxiosResponse } from 'axios'
+import axios, {AxiosResponse} from 'axios'
 
 const instance = axios.create({
     baseURL: 'https://social-network.samuraijs.com/api/1.1/',
     withCredentials: true,
     headers: {
-        'API-KEY': '5e6a7b1c-21b1-4e22-a0fc-e968510da760'
+        'API-KEY': '2c4c11b3-b7ca-4a85-9ffe-5b500c4db141'
     }
 })
 
@@ -36,7 +36,26 @@ export const todolistsAPI = {
     }
 }
 
+export const authAPI = {
+    login(data: LoginType) {
+        return instance.post<LoginType, AxiosResponse<ResponseType<{ userId: number }>>>(`/auth/login`, data);
+    },
+    me() {
+        return instance.get<ResponseType<UserType>>(`/auth/me`);
+    }
+}
 // types
+export type UserType = {
+    id: string
+    email: string
+    login: string
+}
+export type LoginType = {
+    email: string
+    password: string
+    rememberMe?: boolean
+    captcha?: boolean
+}
 export type TodolistType = {
     id: string
     title: string
@@ -58,19 +77,17 @@ export enum TaskStatuses {
     Draft = 3
 }
 
-export enum TaskPriorities {
-    Low = 0,
-    Middle = 1,
-    Hi = 2,
-    Urgently = 3,
-    Later = 4
+export enum Result_code {
+    OK = 0,
+    ERROR = 1,
+    CAPTCHA = 10
 }
 
 export type TaskType = {
     description: string
     title: string
     status: TaskStatuses
-    priority: TaskPriorities
+    priority: Result_code
     startDate: string
     deadline: string
     id: string
@@ -82,7 +99,7 @@ export type UpdateTaskModelType = {
     title: string
     description: string
     status: TaskStatuses
-    priority: TaskPriorities
+    priority: Result_code
     startDate: string
     deadline: string
 }
